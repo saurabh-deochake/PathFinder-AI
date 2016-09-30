@@ -5,7 +5,7 @@
 import random
 
 class Map:
-	def _create_grid(self):
+	def __init__(self):
 		# Creating a grid of size 120 x160 and setting 
 		# all cells as walkable
 		rows, columns = 120, 160
@@ -159,11 +159,21 @@ class Map:
 
 
 					rand_y = rand_y - 19
-	
+		
+		for grid_line in grid:
+			print grid_line
+
+		self._write_grid(grid)
+
+	def _write_grid(self, grid):
+		f = open("mapfile", 'w')
+		for grid_line in grid:
+			f.write(str(grid_line))
+		f.close()
 
 def main():
 	map_obj = Map()
-	map_obj._create_grid()
+	#map_obj._create_grid()
 
 if __name__ == '__main__':
 	main()
