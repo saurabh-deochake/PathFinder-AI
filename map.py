@@ -9,7 +9,7 @@ class Map:
 		# Creating a grid of size 120 x160 and setting 
 		# all cells as walkable
 		rows, columns = 120, 160
-		grid = [[1 for x in range(columns)] for y in range(rows)] 
+		grid = [['1' for x in range(columns)] for y in range(rows)] 
 		self._harder_to_traverse(grid)
 
 	def _harder_to_traverse(self, grid):
@@ -50,118 +50,269 @@ class Map:
 			for i in range(x_min, x_max+1):
 				for j in range(y_min, y_max+1):
 					if random.randint(0,1) == 0:
-						grid[j][i] = 2	
+						grid[j][i] = '2'	
 		
 		#return grid
 		self._create_highway(grid)
 
-		
+	def _helper_create_highway_horizontal(self, grid, yVal, xVal, check_val, add):
+		finished = 0 #this variable will keep track of when a highway touched
+		finish = [0, 0, 0, 0]
+		arr = [0, 0, 0, 0] #1 - > left, 2 -> right, 3 -> both
+		count = 1
+		while (finished < 4):
+			#print "3 xVal :", xVal, " yVal: ", yVal
+			arrMove = [0, 0, 0, 0]
+			if count > 1:
+				for i in range(0,len(arr)):
+					if arr[i] > 0:
+						#check for the probability
+						if(random.sample(range(0,8), 1) > 5):
+							arrMove[i] = 1
+			#print "*************** COUNT: ", count, " arrMove", arrMove, " arr", arr
+
+			for x_coord in range(0, len(xVal)):
+				#print "4 xVal :", xVal, " yVal: ", yVal
+				#print "***********************X COORDINATE ", xVal[x_coord], " Y COORDINATE: ", yVal[x_coord]
+				#print "FINISHED: ", finish
+				x, y = xVal[x_coord], yVal[x_coord]
+				#check for #3 as an input
+				if arr[x_coord] == 3:
+						if random.randint(0,1) == 0:
+						#you are moving left
+							arr[x_coord] = 1
+						else:
+							arr[x_coord] = 2
+
+				for step in range(1, 21):
+					if finish[x_coord] == 1:
+						break
+					if arr[x_coord] == -1 or arr[x_coord] == 0 or count == 1:
+						y = y + add
+						x = xVal[x_coord] ### rand_x[index] to rand_x[x_coord] ?
+					elif arr[x_coord] > 0 and count > 1 and arrMove[x_coord] > 0:
+						#truning left or right with the probability	
+						if x == -1:
+							x = xVal[x_coord]
+						if arr[x_coord] == 1:
+							x = x -1
+							y = yVal[x_coord]
+						elif arr[x_coord] == 2:
+							x = x + 1
+							y = yVal[x_coord]
+
+					if grid[x][y] == '2':
+						xVal[x_coord] = x
+						yVal[x_coord] = y
+						#print xVal[x_coord], " ", yVal[x_coord], " ", grid[x][y], " ", 'b'
+						grid[x][y] = 'b'
+					else:
+						xVal[x_coord] = x
+						yVal[x_coord] = y
+						#print xVal[x_coord], " ", yVal[x_coord], " ", grid[x][y], " ", 'a'
+						grid[x][y] = 'a'
+					#check to be done
+					if xVal[x_coord] == 0 or yVal[x_coord] == check_val or xVal[x_coord] == 119:
+						finished = finished + 1
+						finish[x_coord] = 1
+
+			#print "1 xVal :", xVal, " yVal: ", yVal
+			if count > 1 and count % 2 == 0:
+				#its the round that was used to turn
+				for index in range(0,len(xVal)):
+					arr[index] = -1
+			elif count > 1 and count % 2 == 1:
+				#it was the round that was not used to turn
+				for index in range(0,len(xVal)):
+					arr[index] = 0
+
+			count = count + 1					
+			#rearrange all the values
+			x_max = max(xVal)
+			x_min = min(xVal)
+			x_middle1= -1
+			x_middle2 = -1
+			for x_coord in xVal:
+				if x_middle1 == -1 and x_coord != x_max and x_coord != x_min:
+					x_middle1 = x_coord
+				elif x_middle1 != -1 and x_coord != x_max and x_coord != x_min:
+					x_middle2 = x_coord
+			if x_middle2 < x_middle1:
+				x_middle1, x_middle2 = x_middle2, x_middle1
+			#so we have so far that it would be x_min, x_middle1, x_middle2, x_max
+			for index in range(0,len(xVal)):
+				if arr[index] == -1:
+					break
+				elif xVal[index] == x_max and x_max + 20 < 120:
+					arr[index] = 2
+				elif xVal[index] == x_min and x_min - 20 >= 0:
+					arr[index] = 1
+				elif xVal[index] == x_middle1:
+					#the rand_x is in the middle, the one closer to x_min
+					if x_min < x_middle1 - 20:
+						#can trun left
+						arr[index] = 1
+					elif x_middle1 + 20 < x_middle2:
+						arr[index] = 2 
+				elif xVal[index] == x_middle2:
+					#the rand_x is in the middle and the one which is closer to the x_max
+					if x_max > x_middle2 + 20:
+						#can trun left
+						arr[index] = 2
+					if x_middle1 + 20 < x_middle2:
+						if arr[index] == 2:
+							arr[index] = 3
+						else:
+							arr[index] = 1 
 	
+
+
+	def _helper_create_highway_vertical(self, grid, yVal, xVal, check_val, add):
+		finished = 0 #this variable will keep track of when a highway touched
+		finish = [0, 0, 0, 0]
+		arr = [0, 0, 0, 0] #1 - > left, 2 -> right, 3 -> both
+		count = 1
+		while (finished < 4):
+			#print "3 xVal :", xVal, " yVal: ", yVal
+			arrMove = [0, 0, 0, 0]
+			if count > 1:
+				for i in range(0,len(arr)):
+					if arr[i] > 0:
+						#check for the probability
+						if(random.sample(range(0,8), 1) > 5):
+							arrMove[i] = 1
+			#print "*************** COUNT: ", count, " arrMove", arrMove, " arr", arr
+
+			for x_coord in range(0, len(yVal)):
+				#print "4 xVal :", xVal, " yVal: ", yVal
+				#print "***********************X COORDINATE ", xVal[x_coord], " Y COORDINATE: ", yVal[x_coord]
+				#print "FINISHED: ", finish
+				x, y = xVal[x_coord], yVal[x_coord]
+				#check for #3 as an input
+				if arr[x_coord] == 3:
+						if random.randint(0,1) == 0:
+						#you are moving left
+							arr[x_coord] = 1
+						else:
+							arr[x_coord] = 2
+
+				for step in range(1, 21):
+					if finish[x_coord] == 1:
+						break
+					if arr[x_coord] == -1 or arr[x_coord] == 0 or count == 1:
+						x = x + add
+						y = yVal[x_coord] ### rand_x[index] to rand_x[x_coord] ?
+					elif arr[x_coord] > 0 and count > 1 and arrMove[x_coord] > 0:
+						#truning left or right with the probability	
+						if y == -1:
+							y = yVal[x_coord]
+						if arr[x_coord] == 1:
+							y = y -1
+							x = xVal[x_coord]
+						elif arr[x_coord] == 2:
+							y = y + 1
+							x = xVal[x_coord]
+
+					if grid[x][y] == '2':
+						xVal[x_coord] = x
+						yVal[x_coord] = y
+						#print xVal[x_coord], " ", yVal[x_coord], " ", grid[x][y], " ", 'b'
+						grid[x][y] = 'b'
+					else:
+						xVal[x_coord] = x
+						yVal[x_coord] = y
+						#print xVal[x_coord], " ", yVal[x_coord], " ", grid[x][y], " ", 'a'
+						grid[x][y] = 'a'
+					#check to be done
+					if yVal[x_coord] == 0 or xVal[x_coord] == check_val or yVal[x_coord] == 159:
+						finished = finished + 1
+						finish[x_coord] = 1
+
+			#print "1 xVal :", xVal, " yVal: ", yVal
+			if count > 1 and count % 2 == 0:
+				#its the round that was used to turn
+				for index in range(0,len(xVal)):
+					arr[index] = -1
+			elif count > 1 and count % 2 == 1:
+				#it was the round that was not used to turn
+				for index in range(0,len(xVal)):
+					arr[index] = 0
+
+			count = count + 1					
+			#rearrange all the values
+			x_max = max(yVal)
+			x_min = min(yVal)
+			x_middle1= -1
+			x_middle2 = -1
+			for y_coord in yVal:
+				if x_middle1 == -1 and y_coord != x_max and y_coord != x_min:
+					x_middle1 = y_coord
+				elif x_middle1 != -1 and y_coord != x_max and y_coord != x_min:
+					x_middle2 = y_coord
+			if x_middle2 < x_middle1:
+				x_middle1, x_middle2 = x_middle2, x_middle1
+			#so we have so far that it would be x_min, x_middle1, x_middle2, x_max
+			for index in range(0,len(yVal)):
+				if arr[index] == -1:
+					break
+				elif yVal[index] == x_max and x_max + 20 < 159:
+					arr[index] = 2
+				elif yVal[index] == x_min and x_min - 20 >= 0:
+					arr[index] = 1
+				elif yVal[index] == x_middle1:
+					#the rand_x is in the middle, the one closer to x_min
+					if x_min < x_middle1 - 20:
+						#can trun left
+						arr[index] = 1
+					elif x_middle1 + 20 < x_middle2:
+						arr[index] = 2 
+				elif yVal[index] == x_middle2:
+					#the rand_x is in the middle and the one which is closer to the x_max
+					if x_max > x_middle2 + 20:
+						#can trun left
+						arr[index] = 2
+					if x_middle1 + 20 < x_middle2:
+						if arr[index] == 2:
+							arr[index] = 3
+						else:
+							arr[index] = 1 
+
+
+
 	def _create_highway(self, grid):
-		#choice = random.randint(0,3)
-		choice = 2
+		choice = random.randint(0,3)
 		if choice % 2 == 0:
 			rand_x = [x for x in random.sample(range(0, 120), 4)]
-			rand_y = 0
-			x_max = max(rand_x)
-			x_min = min(rand_x)
-			arr = [0, 0, 0, 0] #1 - > left, 2 -> right, 3 -> both
 			if choice == 2:
-				rand_y = 159
-				x_middle1= -1
-				x_middle2 = -1
-				for x_coord in rand_x:
-					if x_middle1 == -1 and x_coord != x_max and x_coord != x_min:
-						x_middle1 = x_coord
-					elif x_middle1 != -1 and x_coord != x_max and x_coord != x_min:
-						x_middle2 = x_coord
-				if x_middle2 < x_middle1:
-					x_middle1, x_middle2 = x_middle2, x_middle1
-				
-				#so we have so far that it would be x_min, x_middle1, x_middle2, x_max
-
-				count = 1
-
-				for y_coord in range(rand_y, -1, -1):
-					x,y = -1, y_coord
-					arrMove = [0, 0, 0, 0]
-					if count > 1:
-						for i in range(0,len(arr)):
-							if arr[i] > 0:
-								#check for the probability
-								if(random.sample(range(0,8), 1) > 5):
-									arrMove[i] = 1
-
-					for step in range(1, 21):
-						for x_coord in range(0, len(rand_x)):
-							if arr[x_coord] == -1 or arr[x_coord] == 0 or count == 1:
-								y = y-1
-								x = rand_x[x_coord] ### rand_x[index] to rand_x[x_coord] ?
-							elif arr[x_coord] > 0 and count > 1 and arrMove[x_coord] > 0:
-								#truning left or right with the probability
-								if x == -1:
-									x = rand_x[x_coord]
-								if arr[x_coord] == 1:
-									x = x -1
-									y = y_coord
-								elif arr[x_coord] == 2:
-									x = x + 1
-									y = y_coord
- 								elif arr[x_coord] == 3:
- 									if random.sample(range(0,2)) == 0:
- 										#you are moving left
- 										x = x - 1
- 										y = y_coord
- 									else:
- 										x = x + 1
- 										y = y_coord
-
-							if grid[x][y] == 2:
-								grid[x][y] = 'b'
-							else:
-								grid[x][y] = 'a'
-
-					
-					if count > 1 and count % 2 == 0:
-						#its the round that was used to turn
-						for index in range(0,len(rand_x)):
-							arr[index] = -1
-					elif count > 1 and count % 2 == 1:
-						#it was the round that was not used to turn
-						for index in range(0,len(rand_x)):
-							arr[index] = 0
-
-					count = count + 1					
-					for index in range(0,len(rand_x)):
-						if arr[index] == -1:
-							break
-						elif rand_x[index] == x_max and x_max + 20 < 120:
-							arr[index] = 2
-						elif rand_x[index] == x_min and x_min - 20 >= 0:
-							arr[index] = 1
-						elif rand_x[index] == x_middle1:
-							#the rand_x is in the middle, the one closer to x_min
-							if x_min < x_middle1 - 20:
-								#can trun left
-								arr[index] = 1
-							elif x_middle1 + 20 < x_middle2:
-								arr[index] = 2 
-						elif rand_x[index] == x_middle2:
-							#the rand_x is in the middle and the one which is closer to the x_max
-							if x_max > x_middle2 + 20:
-								#can trun left
-								arr[index] = 2
-							if x_middle1 + 20 < x_middle2:
-								if arr[index] == 2:
-									arr[index] = 3
-								else:
-									arr[index] = 1 
-
-
-					rand_y = rand_y - 19
+				#this will have current value for x and y
+				xVal = [x for x in rand_x]
+				yVal = [159, 159, 159, 159]
+				self._helper_create_highway_horizontal(grid, yVal, xVal, 0, -1)
+			if choice == 0:
+				#this will have current value for x and y
+				xVal = [x for x in rand_x]
+				yVal = [0, 0, 0, 0]
+				self._helper_create_highway_horizontal(grid, yVal, xVal, 159, 1)
 		
+		else: 
+			#the value is for vertical
+			rand_y = [x for x in random.sample(range(0, 160), 4)]
+			if choice == 1:
+				#this will have current value for x and y
+				yVal = [x for x in rand_y]
+				xVal = [0, 0, 0, 0]
+				self._helper_create_highway_vertical(grid, yVal, xVal, 119, 1)
+			if choice == 3:
+				#this will have current value for x and y
+				yVal = [x for x in rand_y]
+				xVal = [119, 119, 119, 119]
+				self._helper_create_highway_vertical(grid, yVal, xVal, 0, -1)
+
 		for grid_line in grid:
-			print grid_line
+			val = str(grid_line)
+			val = val[1:-1]
+			val = val.replace(",", "")
+			print "\n", val
 
 		self._write_grid(grid)
 
