@@ -50,15 +50,78 @@ class Map:
 			for i in range(x_min, x_max+1):
 				for j in range(y_min, y_max+1):
 					if random.randint(0,1) == 0:
-						print i, j
 						grid[j][i] = 2	
 		return grid	
 
 		#for grid_line in grid:
 		#	print grid_line
-		
+	"""
+	def _create_highway(self, grid):
+		choice = random.randint(0,3)
+
+		if choice % 2 == 0:
+			rand_x = [x for x in random.sample(range(0, 120)), 4]
+			rand_y = 0
+			x_max = max(rand_x)
+			x_min = min(rand_x)
+
+			if choice == 2:
+				rand_y = 159
+
+				for y_coord in range((rand_y, 0), -1):
+					for step in range(1, 21):
+						for x_coord in rand_x:
+							if grid[x_coord][rand_y - step] == 2:
+								grid[x_coord][rand_y - step] = 'b'
+							else:
+								grid[x_coord][rand_y - step] = 'a'
+					
+					arr = [0, 0, 0, 0]
+					x_middle = 0
+					for index in range(0,len(rand_x)):
+						if rand_x[index] == x_max and x_max + 20 < 120:
+							arr[index] = 2
+						elif rand_x[index] == x_min and x_min - 20 >= 0:
+							arr[index] = 1
+						elif rand_x[index] != x_min and rand_x[index] != x_max:
+							if rand_x[index] - x_min > x_max - rand_x[index]
+								# When this index is closer to x_max
+								if x_max - rand_x[index] > 20:
+									if x_middle != 0 and x_middle > rand_x[index] :
+										if x_middle > rand_x[index] + 20:
+										# Checking if enough space between
+										# x_middle and rand_x[index]
+											if rand_x[index] - 20 > x_min:
+												arr[index] = 3
+											else:
+												arr[index] = 2
+										else:
+											if rand_x[index] - 20 > x_min:
+												arr[index] = 1
+									elif x_middle != 0 and x_middle < rand_x[index] :
+										if x_middle < rand_x[index] - 20:
+										# Checking if enough space between
+										# x_middle and rand_x[index]
+											if rand_x[index] + 20 > x_min:
+												arr[index] = 3
+											else:
+												arr[index] = 2
+										else:
+											if rand_x[index] - 20 > x_min:
+												arr[index] = 1
 
 
+
+								if x_middle == 0:
+									x_middle = rand_x[index]
+
+
+
+
+
+
+					rand_y = rand_y - 19
+		"""
 
 def main():
 	map_obj = Map()
