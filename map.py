@@ -16,7 +16,7 @@ class Map:
 		random_x_coordinates = [x for x in random.sample(range(0, 160), 8)]
 		random_y_coordinates = [y for y in random.sample(range(0, 120), 8)]
 
-		print random_x_coordinates, random_y_coordinates
+		#print random_x_coordinates, random_y_coordinates
 		
 		
 		x_min, x_max, y_min, y_max = 0,0,0,0
@@ -47,23 +47,16 @@ class Map:
 				y_max = 119
 				y_min = (random_y_coordinates[i] - 15) - (15 -(119 - random_y_coordinates[i]))
 				
-			#else: 
-				#y_max = random_y_coordinates[i] + 15
+			for i in range(x_min, x_max+1):
+				for j in range(y_min, y_max+1):
+					if random.randint(0,1) == 0:
+						print i, j
+						grid[j][i] = 2	
+		return grid	
 
-				
-			print [x_min, y_min, x_max, y_max]
-
+		#for grid_line in grid:
+		#	print grid_line
 		
-		#print random_coordinates[0], random_coordinates[1]
-
-		'''for k in range(1, 16):
-			grid[random_coordinates[0]-k][random_coordinates[1]] = 2
-			for grid_line in grid:
-				print grid_line
-		'''
-
-		
-
 
 
 
