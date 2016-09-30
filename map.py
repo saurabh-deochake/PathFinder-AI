@@ -52,11 +52,11 @@ class Map:
 					if random.randint(0,1) == 0:
 						grid[j][i] = 2	
 		
-		return grid
-		#self._create_highway(grid)
+		#return grid
+		self._create_highway(grid)
 
 		
-	"""
+	
 	def _create_highway(self, grid):
 		#choice = random.randint(0,3)
 		choice = 2
@@ -89,15 +89,15 @@ class Map:
 						for i in range(0,len(arr)):
 							if arr[i] > 0:
 								#check for the probability
-								if(random.sample(range(0,8)) > 5):
+								if(random.sample(range(0,8), 1) > 5):
 									arrMove[i] = 1
 
 					for step in range(1, 21):
 						for x_coord in range(0, len(rand_x)):
 							if arr[x_coord] == -1 or arr[x_coord] == 0 or count == 1:
 								y = y-1
-								x = rand_x[index] ### rand_x[step] ?
-							elif arr[x_coord] > 0 and count > 1 and arrMove[index] > 0:
+								x = rand_x[x_coord] ### rand_x[index] to rand_x[x_coord] ?
+							elif arr[x_coord] > 0 and count > 1 and arrMove[x_coord] > 0:
 								#truning left or right with the probability
 								if x == -1:
 									x = rand_x[x_coord]
@@ -159,7 +159,7 @@ class Map:
 
 
 					rand_y = rand_y - 19
-	"""
+	
 
 def main():
 	map_obj = Map()
