@@ -316,16 +316,17 @@ class Map:
 
 	def _create_blocked_cells(self, grid):
 		
-
-		for i in range(3840):
+		i = 0
+		while (i < 3840):
 			x = random.sample(range(0, 120), 1)[0]
 			y = random.sample(range(0, 160), 1)[0]
 
-			if grid[x][y] == 'a' or grid[x][y] == 'b' or grid[x][y] == '2':
-				i = i - 1
+			if grid[x][y] == 'a' or grid[x][y] == 'b' or grid[x][y] == '2' or grid[x][y] == '0':
 				continue
 			else:
 				grid[x][y] = '0'
+				i = i + 1
+
 		return grid
 
 
@@ -356,7 +357,6 @@ class Map:
 				check = math.hypot(row_choice_s - row_choice_g, col_choice_s - col_choice_g)
 			
 			grid[row_choice_s][col_choice_s], grid[row_choice_g][col_choice_g] = 'S','G'
-			print row_choice_s , " " , col_choice_s
 
 		self._write_grid(grid, row_choice_s, col_choice_s, row_choice_g, col_choice_g, random_x_coordinates, random_y_coordinates)
 
@@ -385,3 +385,5 @@ def main():
 
 if __name__ == '__main__':
 	main()
+
+	
