@@ -361,7 +361,7 @@ class Map:
 		self._write_grid(grid, row_choice_s, col_choice_s, row_choice_g, col_choice_g, random_x_coordinates, random_y_coordinates)
 
 	def _write_grid(self, grid, row_choice_s, col_choice_s, row_choice_g, col_choice_g, random_x_coordinates, random_y_coordinates):
-		f = open("mapfile", 'w')
+		f = open("mapfile.txt", 'w')
 
 		start = "S: " + str(row_choice_s) + ", " + str(col_choice_s) + "\n"
 		end = "G: " + str(row_choice_g) + ", "  + str(col_choice_g) + "\n"
@@ -375,7 +375,8 @@ class Map:
 		for grid_line in grid:
 			val = str(grid_line)
 			val = val[1:-1]
-			val.replace(",", "")
+			val = val.replace(",", "")
+			val = val.replace("'", "")
 			val = val + "\n"
 			f.write(val)
 		f.close()
