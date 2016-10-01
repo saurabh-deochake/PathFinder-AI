@@ -3,19 +3,20 @@
 # Email: {saurabh.deochake, rohit.bobade}@rutgers.edu
 
 import random
-
+import math
 class Map:
+	
 	def __init__(self):
 		# Creating a grid of size 120 x160 and setting 
 		# all cells as walkable
-		rows, columns = 120, 160
+		rows, columns = 120, 160 
 		grid = [['1' for x in range(columns)] for y in range(rows)] 
+		
 		self._harder_to_traverse(grid)
 
 	def _harder_to_traverse(self, grid):
 		random_x_coordinates = [x for x in random.sample(range(0, 160), 8)]
 		random_y_coordinates = [y for y in random.sample(range(0, 120), 8)]
-
 		#print random_x_coordinates, random_y_coordinates
 		
 		
@@ -53,7 +54,7 @@ class Map:
 						grid[j][i] = '2'	
 		
 		#return grid
-		self._create_highway(grid)
+		self._create_highway(grid, random_x_coordinates, random_y_coordinates)
 
 	def _helper_create_highway_horizontal(self, grid, yVal, xVal, check_val, add):
 		finished = 0 #this variable will keep track of when a highway touched
@@ -279,7 +280,7 @@ class Map:
 
 
 
-	def _create_highway(self, grid):
+	def _create_highway(self, grid, random_x_coordinates, random_y_coordinates):
 		choice = random.randint(0,3)
 		if choice % 2 == 0:
 			rand_x = [x for x in random.sample(range(0, 120), 4)]
@@ -308,25 +309,79 @@ class Map:
 				xVal = [119, 119, 119, 119]
 				self._helper_create_highway_vertical(grid, yVal, xVal, 0, -1)
 
+
+		#self._write_grid(grid)
+		grid = self._create_blocked_cells(grid)
+		self._set_start_end_nodes(grid,(choice%2), random_x_coordinates, random_y_coordinates)
+
+	def _create_blocked_cells(self, grid):
+		
+
+		for i in range(3840):
+			x = random.sample(range(0, 120), 1)[0]
+			y = random.sample(range(0, 160), 1)[0]
+
+			if grid[x][y] == 'a' or grid[x][y] == 'b' or grid[x][y] == '2':
+				i = i - 1
+				continue
+			else:
+				grid[x][y] = '0'
+		return grid
+
+
+	def _set_start_end_nodes(self, grid, v, random_x_coordinates, random_y_coordinates):
+		if v == 1:
+			#starting node
+			row_choice_s, col_choice_s = random.randint(0,20), random.randint(0,159)
+			#gaol node
+			row_choice_g, col_choice_g = random.randint((119-row_choice_s),119), random.randint(0,159)
+			check = math.hypot(row_choice_s - row_choice_g, col_choice_s - col_choice_g)
+
+			while(check < 100) or (grid[row_choice_s][col_choice_s] != '1' and grid[row_choice_s][col_choice_s] != '2') or (grid[row_choice_g][col_choice_g] != '1' and grid[row_choice_g][col_choice_g] != '2'):
+				row_choice_s, col_choice_s = random.randint(0,20), random.randint(0,159)
+				row_choice_g, col_choice_g = random.randint((119-row_choice_s),119), random.randint(0,159)
+				check = math.hypot(row_choice_s - row_choice_g, col_choice_s - col_choice_g)
+
+			grid[row_choice_s][col_choice_s], grid[row_choice_g][col_choice_g] = 'S','G'
+		else:
+			#starting node
+			col_choice_s, row_choice_s = random.randint(0,20), random.randint(0,119)
+			#gaol node
+			col_choice_g, row_choice_g = random.randint((159-col_choice_s),159), random.randint(0,119)
+			check = math.hypot(row_choice_s - row_choice_g, col_choice_s - col_choice_g)
+			
+			while(check < 100) or (grid[row_choice_s][col_choice_s] != '1' and grid[row_choice_s][col_choice_s] != '2') or (grid[row_choice_g][col_choice_g] != '1' and grid[row_choice_g][col_choice_g] != '2'):
+				col_choice_s, row_choice_s = random.randint(0,20), random.randint(0,119)
+				col_choice_g, row_choice_g = random.randint((159-col_choice_s),159), random.randint(0,119)
+				check = math.hypot(row_choice_s - row_choice_g, col_choice_s - col_choice_g)
+			
+			grid[row_choice_s][col_choice_s], grid[row_choice_g][col_choice_g] = 'S','G'
+			print row_choice_s , " " , col_choice_s
+
+		self._write_grid(grid, row_choice_s, col_choice_s, row_choice_g, col_choice_g, random_x_coordinates, random_y_coordinates)
+
+	def _write_grid(self, grid, row_choice_s, col_choice_s, row_choice_g, col_choice_g, random_x_coordinates, random_y_coordinates):
+		f = open("mapfile", 'w')
+
+		start = "S: " + str(row_choice_s) + ", " + str(col_choice_s) + "\n"
+		end = "G: " + str(row_choice_g) + ", "  + str(col_choice_g) + "\n"
+		f.write(start)
+		f.write(end)
+		#writing all the points
+		for i in range(0, len(random_x_coordinates)):
+			string = "HT" + str(i+1) + ": " + str(random_x_coordinates[i]) + ", " + str(random_y_coordinates[i]) + "\n"
+			f.write(string)
+		#writing the grid
 		for grid_line in grid:
 			val = str(grid_line)
 			val = val[1:-1]
-			val = val.replace(",", "")
-			print "\n", val
-
-		self._write_grid(grid)
-
-	def _write_grid(self, grid):
-		f = open("mapfile", 'w')
-		for grid_line in grid:
-			f.write(str(grid_line))
+			val.replace(",", "")
+			val = val + "\n"
+			f.write(val)
 		f.close()
 
 def main():
 	map_obj = Map()
-	#map_obj._create_grid()
 
 if __name__ == '__main__':
 	main()
-
-	
