@@ -1,6 +1,6 @@
 Please refer to following files to run different algorithms:
 
-Maps: map.py
+Maps: map_final.py
 A*: astar.py
 Uniform Cost Search: ucs.py
 Weighted A*: weighted_astar.py
