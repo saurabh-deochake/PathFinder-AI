@@ -1,0 +1,7 @@
+Please refer to following files to run different algorithms:
+
+Maps: map.py
+A*: astar.py
+Uniform Cost Search: ucs.py
+Weighted A*: weighted_astar.py
+Visualization: astar_visualization.py
